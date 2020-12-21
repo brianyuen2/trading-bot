@@ -1,4 +1,6 @@
 from binance.client import Client
+from binance.enums import *
+from binance.exceptions import BinanceAPIException, BinanceOrderException
 import constants
 import time
 
@@ -6,7 +8,10 @@ client = Client(constants.API_KEY, constants.API_SECRET)
 
 # Returns eth/usdt current price
 def get_eth_usdt_price():
-    return client.get_symbol_ticker(symbol="ETHUSDT")['price']
+    try:
+        return client.get_symbol_ticker(symbol="ETHUSDT")['price']
+    except:
+        print('Error getting price')
 
 # Returns eth and usdt balances for the account in an array
 def get_eth_usdt_balance():
@@ -21,27 +26,19 @@ def get_eth_usdt_balance():
 # takes in side and quantity
 def create_new_eth_order(side, quantity):
     # Remove test when real trades are wanted
-    return client.create_test_order(
-    symbol='ETHUSDT',
-    side=side,
-    type='MARKET',
-    quantity=quantity,
-)
+    try:
+        return client.create_test_order (
+        symbol='ETHUSDT',
+        side=side,
+        type='MARKET',
+        quantity=quantity,
+    )
+    except BinanceAPIException as e:
+        # error handling goes here
+        print(e)
+    except BinanceOrderException as e:
+        # error handling goes here
+        print(e)
 
-# Main logic function, pulls information from account and exchange before
-# deciding to trade or not
-def attempt_trade():
-    # if certain indicators are __ 
-    balance = get_eth_usdt_balance()
-    print(balance)
-
-# Bot loop cycle
-# attempts to make a trade every 30 sec
-def run_bot():
-    while(1):
-        attempt_trade()
-        time.sleep(30)
-
-
-run_bot()
+# run_bot()
 # create_new_eth_order('SELL', 0.1)
